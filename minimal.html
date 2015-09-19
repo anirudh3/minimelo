@@ -1,10 +1,62 @@
 <html>
+
+<meta charset="utf-8">
+
+
+
+
+<style>
+svg {
+  font: 10px sans-serif;
+}
+.line {
+  fill: none;
+  stroke: #000;
+  stroke-width: 1.5px;
+}
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+</style>
+
+<style>
+
+.chart rect {
+  fill: steelblue;
+}
+
+.chart text {
+  fill: white;
+  font: 10px sans-serif;
+  text-anchor: end;
+}
+
+</style>
+
+
+
+
+
 <head>
+
+
+
+<svg class="chart"></svg>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+
+
+
+
+
 <script>
 // Define the set of test frequencies that we'll use to analyze microphone data.
 var C2 = 65.41; // C2 note, in Hz.
 var notes = [ "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B" ];
 var test_frequencies = [];
+var sur;
 for (var i = 0; i < 30; i++)
 {
 	var note_frequency = C2 * Math.pow(2, i / 12);
@@ -101,11 +153,49 @@ function interpret_correlation_result(event)
 	var average = magnitudes.reduce(function(a, b) { return a + b; }, 0) / magnitudes.length;
 	var confidence = maximum_magnitude / average;
 	var confidence_threshold = 10; // empirical, arbitrary.
+	
 	if (confidence > confidence_threshold)
 	{
 		var dominant_frequency = test_frequencies[maximum_index];
 		document.getElementById("note-name").textContent = dominant_frequency.name;
 		document.getElementById("frequency").textContent = dominant_frequency.frequency;
+
+
+		// The following is the sample code for the bar chart implementation
+
+		// var data = [dominant_frequency.frequency];
+
+		// var width = 420,
+  //   	barHeight = 100;
+
+		// var x = d3.scale.linear()
+  //   		.domain([0, 500])
+  //   		.range([0, width]);
+
+  //   	d3.max(data)
+
+		// var chart = d3.select(".chart")
+  //   		.attr("width", width)
+  //   		.attr("height", barHeight * data.length);
+
+		// var bar = chart.selectAll("g")
+  //   		.data(data)
+  // 			.enter().append("g")
+  //   		.attr("transform", function(d, i) { return "translate(0," + i * barHeight + ")"; });
+
+		// bar.append("rect")
+  //   		.attr("width", x)
+  //   		.attr("height", barHeight - 1);
+
+		// bar.append("text")
+  //   		.attr("x", function(d) { return x(d) - 3; })
+  //   		.attr("y", barHeight / 2)
+  //   		.attr("dy", ".35em")
+  //   		.text(function(d) { return d; });
+
+
+
+
 	}
 }
 
@@ -129,9 +219,90 @@ function toggle_playing_note()
 		gain_node.gain.value = 0;
 }
 </script>
+
+
+<!-- 
+This is the sample code for the graph implementation -->
+
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+<script>
+var n = 36,
+    random = d3.random.normal(0, .2),
+    data = d3.range(n).map(random);
+    //data = sur;
+var margin = {top: 20, right: 20, bottom: 20, left: 40},
+    width = 960 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+var x = d3.scale.linear()
+    .domain([10,0])
+    .range([0, width]);
+var y = d3.scale.linear()
+    .domain([0,36])
+    .range([height, 0]);
+var line = d3.svg.line()
+    .x(function(d, i) { return x(i); })
+    .y(function(d, i) { return y(d); });
+var svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+svg.append("defs").append("clipPath")
+    .attr("id", "clip")
+  .append("rect")
+    .attr("width", width)
+    .attr("height", height);
+svg.append("g")
+    .attr("class", "x axis")
+    .attr("transform", "translate(0," + y(0) + ")")
+    .call(d3.svg.axis().scale(x).orient("bottom"));
+svg.append("g")
+    .attr("class", "y axis")
+    .call(d3.svg.axis().scale(y).orient("right"));
+var path = svg.append("g")
+    .attr("clip-path", "url(#clip)")
+  .append("path")
+    .datum(data)
+    .attr("class", "line")
+    .attr("d", line);
+tick();
+
+
+function tick() {
+  // push a new data point onto the back
+  //data.push(random());
+  data.push(sur);
+  // redraw the line, and slide it to the left
+  path
+      .attr("d", line)
+      .attr("transform", null)
+    .transition()
+      .duration(500)
+      .ease("linear")
+      .attr("transform", "translate(" + x(-1) + ",0)")
+      .each("end", tick);
+  // pop the old data point off the front
+  data.shift();
+}
+</script>
+
+
+ -->
+<!-- 
+<script src="http://d3js.org/d3.v3.min.js"></script> -->
+
+
+
+
+
 </head>
 
+
+
 <body>
+
+
+
 <p>It sounds like you're playing...</p>
 <h1 id="note-name"></h1>
 <p>
